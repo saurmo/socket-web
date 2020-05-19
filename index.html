@@ -1,11 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"
+      rel="stylesheet"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
+    />
+
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inicio - Sockets</title>
   </head>
   <body>
-    <h1>Prueba</h1>
+    <div id="app">
+      <v-app>
+        <v-content>
+          <v-container>
+            <h1>Turnos</h1>
+            <v-row>
+              <v-col cols="8">
+                PANTALLA
+              </v-col>
+              <v-col cols="4">
+                CAJA
+                <v-form ref="form" v-if="!conectado">
+                  <v-text-field
+                    name="nombre"
+                    label="Ingrese su nombre"
+                    id="nombre"
+                    v-model="nombre"
+                    required
+                    :rules="nombreReglas"
+                  ></v-text-field>
+                  <v-btn block color="primary" dark @click="iniciar"
+                    >Iniciar sesión</v-btn
+                  >
+                </v-form>
+                <div v-else>
+                  {{nombre}}
+                  <v-btn color="success" @click="salir">Salir</v-btn>
+                </div>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-content>
+      </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script>
+      new Vue({
+        el: "#app",
+        vuetify: new Vuetify(),
+        data() {
+          return {
+            nombre: "",
+            nombreReglas: [(v) => !!v || "Nombre requerido"],
+            socket: null,
+            conectado: false,
+          };
+        },
+        methods: {
+          iniciar() {
+            if (this.$refs.form.validate()) {
+              let url = "https://socket-api-saurmo.herokuapp.com/";
+              let urlLocal = "http://localhost:3001/";
+              this.socket = io(url);
+
+              this.socket.emit("nuevo usuario", { nombre: this.nombre }, () => {
+                console.log("[front] Usuario aceptado en el socket");
+                this.conectado = true;
+              });
+
+              this.socket.on("nuevo usuario", (data) => {
+                console.log("[front] Un usuario se conecto al socket ", data);
+              });
+            }
+          },
+          salir() {
+            this.socket.disconnect();
+            this.conectado = false;
+          },
+        },
+      });
+    </script>
   </body>
 </html>
