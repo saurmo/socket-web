@@ -77,9 +77,9 @@
         },
         methods: {
           cargarTurnos() {
-            // let url = "https://socket-api-saurmo.herokuapp.com/";
+            let url = "https://socket-api-saurmo.herokuapp.com/";
             let urlLocal = "http://localhost:3001/";
-            this.socket = io(urlLocal);
+            this.socket = io(url);
             this.socket.on("estadoTurnos", (data) => {
               this.turnos = data.info.turnos;
               this.actual = data.info.actual;
