@@ -29,10 +29,42 @@
             <h1>Turnos</h1>
             <v-row>
               <v-col cols="8">
-                PANTALLA
+                PANTALLA PRIVADA
+                <br />
+                <span v-if="!conectado">Debe iniciar sesión</span>
+
+                <v-card v-if="conectado">
+                  <v-card-actions>
+                    Generar Turno
+                  </v-card-actions>
+                  <v-card-text>
+                    <v-btn color="success" @click="generarTurno">Generar Turno</v-btn>
+                  </v-card-text>
+                </v-card>
+                <br />
+                <v-card v-if="conectado">
+                  <v-card-actions>
+                    Atender turno
+                  </v-card-actions>
+                  <v-card-text>
+                    <v-text-field
+                      name="caja"
+                      label="Ingrese el # caja que esta atendiendo"
+                      id="caja"
+                      v-model="caja"
+                      required
+                      :rules="camposReglas"
+                    ></v-text-field>
+
+                    <v-btn color="primary" @click="atenderTurno">Atender Turno</v-btn>
+                  </v-card-text>
+                </v-card>
+
+                <br />
+                <h2>{{mensaje}}</h2>
               </v-col>
               <v-col cols="4">
-                CAJA
+                EMPLEADO
                 <v-form ref="form" v-if="!conectado">
                   <v-text-field
                     name="nombre"
@@ -40,7 +72,7 @@
                     id="nombre"
                     v-model="nombre"
                     required
-                    :rules="nombreReglas"
+                    :rules="camposReglas"
                   ></v-text-field>
                   <v-btn block color="primary" dark @click="iniciar"
                     >Iniciar sesión</v-btn
@@ -67,17 +99,19 @@
         data() {
           return {
             nombre: "",
-            nombreReglas: [(v) => !!v || "Nombre requerido"],
+            camposReglas: [(v) => !!v || "Campo requerido"],
             socket: null,
             conectado: false,
+            caja: "",
+            mensaje: "",
           };
         },
         methods: {
           iniciar() {
             if (this.$refs.form.validate()) {
-              let url = "https://socket-api-saurmo.herokuapp.com/";
+              // let url = "https://socket-api-saurmo.herokuapp.com/";
               let urlLocal = "http://localhost:3001/";
-              this.socket = io(url);
+              this.socket = io(urlLocal);
 
               this.socket.emit("nuevo usuario", { nombre: this.nombre }, () => {
                 console.log("[front] Usuario aceptado en el socket");
@@ -92,6 +126,22 @@
           salir() {
             this.socket.disconnect();
             this.conectado = false;
+          },
+          atenderTurno() {
+            console.log("Atender turno");
+            if (this.caja) {
+              this.socket.emit("atenderTurno", { caja: this.caja }, (res) => {
+                console.log(res);
+              });
+            } else {
+              this.mensaje = "Necesita ingresar el # de la caja";
+            }
+          },
+          generarTurno() {
+            console.log("Generar turno");
+            this.socket.emit("generarTurno", {}, (res) => {
+              console.log(res);
+            });
           },
         },
       });

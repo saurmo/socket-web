@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"
+      rel="stylesheet"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
+    />
+
+    <meta charset="UTF-8" />
+    <title>Tablero - Sockets</title>
+  </head>
+  <body>
+    <div id="app">
+      <v-app>
+        <v-content>
+          <v-container>
+            <h1>Turnos</h1>
+            <v-row>
+              <v-col cols="8">
+                <v-card v-if="actual">
+                  <v-card-title primary-title>
+                    Turno actual
+                  </v-card-title>
+                  <v-card-text>
+                    <b>Turno</b>: {{actual.numero}}
+                    <br />
+                    <b>Caja</b>: {{actual.caja}}
+                    <br />
+                    <b>Estado</b>: {{actual.estado}}
+                  </v-card-text>
+                </v-card>
+                <br />
+                <v-card v-for="(item, index) in turnos" :key="index">
+                  <v-card-text>
+                    <b>Turno</b>: {{item.numero}}
+                    <br />
+                    <b>Caja</b>: {{item.caja}}
+                    <br />
+                    <b>Estado</b>: {{item.estado}}
+                  </v-card-text>
+                </v-card>
+                <br />
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-content>
+      </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script>
+      new Vue({
+        el: "#app",
+        vuetify: new Vuetify(),
+        data() {
+          return {
+            turnos: [],
+            actual: null,
+          };
+        },
+        beforeMount() {
+          this.cargarTurnos();
+        },
+        methods: {
+          cargarTurnos() {
+            // let url = "https://socket-api-saurmo.herokuapp.com/";
+            let urlLocal = "http://localhost:3001/";
+            this.socket = io(urlLocal);
+            this.socket.on("estadoTurnos", (data) => {
+              this.turnos = data.info.turnos;
+              this.actual = data.info.actual;
+            });
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
