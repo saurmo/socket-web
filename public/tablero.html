@@ -28,25 +28,27 @@
           <v-container>
             <h1>Turnos</h1>
             <v-row>
-              <v-col cols="8">
-                <v-card v-if="actual">
-                  <v-card-title primary-title>
-                    Turno actual
-                  </v-card-title>
+              <v-col cols="6">
+                <h2>Turnos en atención</h2>
+                <br />
+                <v-card v-for="(item, index) in actual" :key="index">
                   <v-card-text>
-                    <b>Turno</b>: {{actual.numero}}
+                    <b>Turno</b>: {{item.numero}}
                     <br />
-                    <b>Caja</b>: {{actual.caja}}
+                    <b>Caja</b>: {{item.caja}}
                     <br />
-                    <b>Estado</b>: {{actual.estado}}
+                    <b>Estado</b>: {{item.estado}}
                   </v-card-text>
                 </v-card>
+                <br />
+              </v-col>
+              <v-col cols="6">
+                <h2>Turnos pendientes</h2>
                 <br />
                 <v-card v-for="(item, index) in turnos" :key="index">
                   <v-card-text>
                     <b>Turno</b>: {{item.numero}}
                     <br />
-                    <b>Caja</b>: {{item.caja}}
                     <br />
                     <b>Estado</b>: {{item.estado}}
                   </v-card-text>
@@ -80,7 +82,10 @@
             let url = "https://socket-api-saurmo.herokuapp.com/";
             let urlLocal = "http://localhost:3001/";
             this.socket = io(url);
+            // this.socket = io(urlLocal);
             this.socket.on("estadoTurnos", (data) => {
+              console.log(data);
+
               this.turnos = data.info.turnos;
               this.actual = data.info.actual;
             });

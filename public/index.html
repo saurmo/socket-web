@@ -110,8 +110,9 @@
           iniciar() {
             if (this.$refs.form.validate()) {
               let url = "https://socket-api-saurmo.herokuapp.com/";
-              let urlLocal = "http://localhost:3001/";
+              // let urlLocal = "http://localhost:3001/";
               this.socket = io(url);
+              // this.socket = io(urlLocal);
 
               this.socket.emit("nuevo usuario", { nombre: this.nombre }, () => {
                 console.log("[front] Usuario aceptado en el socket");
